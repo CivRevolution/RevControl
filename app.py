@@ -70,12 +70,13 @@ class LogHandler(FileSystemEventHandler):
 
     def on_modified(self, event):
         if not event.is_directory and event.src_path.endswith(self.filename):
-            with open(self.filename, 'r') as f:
+            with open('./logs/' + self.filename, 'r') as f:
                 f.seek(self.last_position)
                 new_data = f.read()
                 self.last_position = f.tell()
                 if new_data:
                     self.callback(new_data)
+
 
 def run_minecraft_server():
     global process
