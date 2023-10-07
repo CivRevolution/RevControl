@@ -99,10 +99,6 @@ def run_minecraft_server():
     observer.schedule(event_handler, path=path)
     observer.start()
 
-@app.before_first_request
-def start_minecraft():
-    run_minecraft_server()
-
 # Check if paper.jar exists
 if not os.path.exists("paper.jar"):
     download_paper_jar()
@@ -133,4 +129,6 @@ def handle_command(command):
 if __name__ == '__main__':
     print("Initializing server...")
     print(f"Starting Flask app on http://0.0.0.0:5000/")
+    thread = threading.Thread(target=run_minecraft_server)
+    thread.start()
     socketio.run(app, host='0.0.0.0', port=5000)
