@@ -49,8 +49,8 @@ def modify_eula_file():
                 f.write(line)
     print("eula.txt modified successfully.")
 
-def ack():
-    print("Message was received by the client!")
+def ack(methods=['GET', 'POST']):
+    print('message was received!!!')
 
 def initial_server_start():
     global process

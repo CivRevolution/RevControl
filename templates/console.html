@@ -65,7 +65,7 @@
         var consoleDiv = document.getElementById('console');
         consoleDiv.innerHTML += data.data + '<br>';
         consoleDiv.scrollTop = consoleDiv.scrollHeight;
-        callback();  // Acknowledge receipt of the message
+        callback();  // This sends the acknowledgment back to the server
     });
 
     function sendCommand() {
