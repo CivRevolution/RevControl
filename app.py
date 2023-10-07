@@ -29,25 +29,31 @@ def download_paper_jar():
                 f.write(chunk)
     print("Download completed.")
 
-def modify_server_properties():
-    print("Modifying server.properties...")
-    with open("server.properties", "r") as f:
+def modify_eula_file():
+    print("Modifying eula.txt...")
+    with open("eula.txt", "r") as f:
         content = f.readlines()
-    with open("server.properties", "w") as f:
+    with open("eula.txt", "w") as f:
         for line in content:
             if "eula=false" in line:
                 f.write("eula=true\n")
             else:
                 f.write(line)
-    print("server.properties modified successfully.")
+    print("eula.txt modified successfully.")
 
 def initial_server_start():
     global process
     print("Starting Minecraft server for the first time...")
     cmd = [JAVA_PATH, f"-Xmx{MEMORY}", f"-Xms{MEMORY}", "-jar", "paper.jar", "nogui"] + OTHER_OPTIONS
     process = subprocess.Popen(cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, bufsize=1, universal_newlines=True)
-    process.communicate()  # Wait for the process to complete
-    modify_server_properties()
+
+    # Wait for eula.txt to be created
+    while not os.path.exists("eula.txt"):
+        pass
+
+    modify_eula_file()
+    process.terminate()
+    process.wait()
 
 def run_minecraft_server():
     global process
