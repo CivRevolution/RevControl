@@ -4,6 +4,7 @@ import subprocess
 import threading
 from flask import Flask, request, jsonify, render_template
 from flask_socketio import SocketIO, emit
+import time
 
 # Settings
 JAVA_PATH = "java"
@@ -59,17 +60,32 @@ def initial_server_start():
     process.terminate()
     process.wait()
 
+def tail_log_file(filename):
+    """
+    Generator function that yields new lines from a file continuously.
+    """
+    with open(filename, 'r') as f:
+        f.seek(0, 2)  # Go to the end of the file
+        while True:
+            line = f.readline()
+            if not line:
+                time.sleep(0.1)  # Sleep briefly before trying again
+                continue
+            yield line
+
 def run_minecraft_server():
     global process
     print("Starting Minecraft server...")
     cmd = [JAVA_PATH, f"-Xmx{MEMORY}", f"-Xms{MEMORY}", "-jar", "paper.jar", "nogui"] + OTHER_OPTIONS
     process = subprocess.Popen(cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, bufsize=1, universal_newlines=True)
 
-    with open(LOG_FILE, 'a') as f:
-        for line in iter(process.stdout.readline, ''):
-            f.write(line)
-            print("Sending to client:", line.strip())  # Debug print
-            socketio.emit('console_output', {'data': line.strip()})
+    # Wait a bit to ensure the server has started and is writing to the log file
+    time.sleep(5)
+
+    # Tail the latest.log file and emit new lines to the web console
+    for line in tail_log_file('./logs/latest.log'):
+        print("Sending to client:", line.strip())  # Debug print
+        socketio.emit('console_output', {'data': line.strip()})
 
 # Check if paper.jar exists
 if not os.path.exists("paper.jar"):
