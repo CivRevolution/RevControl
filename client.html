@@ -6,7 +6,7 @@
     <title>WebSocket Test</title>
     <script>
         document.addEventListener("DOMContentLoaded", function() {
-            var socket = new WebSocket("ws://YOUR_SERVER_IP:5678/");
+            var socket = new WebSocket("ws://192.168.2.50:5678/");
             socket.onmessage = function(event) {
                 document.getElementById('messages').innerHTML += '<p>' + event.data + '</p>';
             };
