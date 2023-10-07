@@ -34,54 +34,43 @@
     </div>
 
     <script>
-        var socket = io.connect(location.origin);
+    var socket = io.connect(location.origin);
 
-        socket.on('console_output', function(data) {
-            var consoleDiv = document.getElementById('console');
-            consoleDiv.innerHTML += data.data + '<br>';
-            consoleDiv.scrollTop = consoleDiv.scrollHeight;
-        });
+    socket.on('console_output', function(data) {
+        console.log("Received from server:", data.data);  // Log every message received
+        var consoleDiv = document.getElementById('console');
+        consoleDiv.innerHTML += data.data + '<br>';
+        consoleDiv.scrollTop = consoleDiv.scrollHeight;
+    });
 
-        function sendCommand() {
-            var command = document.getElementById('command').value;
-            socket.emit('send_command', command);
-            document.getElementById('command').value = '';
-        }
+    function sendCommand() {
+        var command = document.getElementById('command').value;
+        socket.emit('send_command', command);
+        document.getElementById('command').value = '';
+    }
 
-        // Logging for Socket.IO connection issues
-        socket.on('connect_error', function(error) {
-            console.error('Connection Error:', error);
-        });
+    // Logging for Socket.IO connection issues
+    socket.on('connect_error', function(error) {
+        console.error('Connection Error:', error);
+    });
 
-        socket.on('connect_timeout', function(timeout) {
-            console.error('Connection Timeout:', timeout);
-        });
+    socket.on('connect_timeout', function(timeout) {
+        console.error('Connection Timeout:', timeout);
+    });
 
-        socket.on('reconnect_error', function(error) {
-            console.error('Reconnection Error:', error);
-        });
+    socket.on('reconnect_error', function(error) {
+        console.error('Reconnection Error:', error);
+    });
 
-        socket.on('reconnect_failed', function() {
-            console.error('Reconnection Failed');
-        });
+    socket.on('reconnect_failed', function() {
+        console.error('Reconnection Failed');
+    });
 
-        // Additional logging for Socket.IO events
-        socket.on('connect', function() {
-            console.log('Connected to the server!');
-        });
+    socket.on('disconnect', function(reason) {
+        console.error('Disconnected:', reason);
+    });
+</script>
 
-        socket.on('disconnect', function(reason) {
-            console.log('Disconnected from the server. Reason:', reason);
-        });
-
-        socket.on('reconnecting', function(attemptNumber) {
-            console.log('Attempting to reconnect. Attempt number:', attemptNumber);
-        });
-
-        socket.on('reconnect', function(attemptNumber) {
-            console.log('Successfully reconnected. Attempt number:', attemptNumber);
-        });
-    </script>
 
     <!-- Bootstrap 5 JS (Optional) -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
