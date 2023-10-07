@@ -1,5 +1,6 @@
 from flask import Flask, render_template
 from flask_socketio import SocketIO
+import threading
 import time
 
 app = Flask(__name__)
@@ -15,5 +16,6 @@ def send_message():
         socketio.emit('message', {'data': 'Hello, client!'})
 
 if __name__ == '__main__':
-    socketio.start_background_task(send_message)
+    thread = threading.Thread(target=send_message)
+    thread.start()
     socketio.run(app, host='0.0.0.0', port=5000)
