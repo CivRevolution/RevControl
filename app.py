@@ -1,6 +1,3 @@
-import eventlet
-eventlet.monkey_patch()
-
 import requests
 import os
 import subprocess
@@ -20,7 +17,7 @@ SERVER_VERSION = "1.20.1"
 PAPER_JAR_URL = "https://gist.githubusercontent.com/osipxd/6119732e30059241c2192c4a8d2218d9/raw/8999ab98f5779901780c3ef7a3f8b7b86a7e4281/paper-versions.json"
 
 app = Flask(__name__)
-socketio = SocketIO(app, logger=True, engineio_logger=True, message_queue='redis://')
+socketio = SocketIO(app, logger=True, engineio_logger=True)
 process = None
 
 @socketio.on('connect')
@@ -131,7 +128,7 @@ def handle_command(command):
 
 if __name__ == '__main__':
     print("Initializing server...")
-    print(f"Starting Flask app on http://0.0.0.0:5000/")
     thread = threading.Thread(target=run_minecraft_server)
     thread.start()
+    print(f"Starting Flask app on http://0.0.0.0:5000/")
     socketio.run(app, host='0.0.0.0', port=5000)
