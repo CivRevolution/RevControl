@@ -94,7 +94,7 @@ def run_minecraft_server():
 
     # Set up watchdog to monitor the latest.log file
     path = os.path.dirname(os.path.abspath('./logs/latest.log'))
-    event_handler = LogHandler('latest.log', lambda data: socketio.emit('console_output', {'data': data.strip()}, room='minecraft_logs'))
+    event_handler = LogHandler('latest.log', lambda data: socketio.emit('console_output', {'data': data.strip()}))
     observer = Observer()
     observer.schedule(event_handler, path=path)
     observer.start()
