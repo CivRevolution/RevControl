@@ -87,14 +87,14 @@ def run_minecraft_server():
     global process
     print("Starting Minecraft server...")
     cmd = [JAVA_PATH, f"-Xmx{MEMORY}", f"-Xms{MEMORY}", "-jar", "paper.jar", "nogui"] + OTHER_OPTIONS
-    process = subprocess.Popen(cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, bufsize=1, universal_newlines=True)
+    process = subprocess.Popen(cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, bufsize=2, universal_newlines=True)
 
     # Wait a bit to ensure the server has started and is writing to the log file
     time.sleep(5)
 
     # Set up watchdog to monitor the latest.log file
     path = os.path.dirname(os.path.abspath('./logs/latest.log'))
-    event_handler = LogHandler('latest.log', lambda data: socketio.emit('console_output', {'data': data.strip()}, room='minecraft_logs'))
+    event_handler = LogHandler('latest.log', lambda data: socketio.emit('console_output', {'data': data.strip()}, callback=ack))
     observer = Observer()
     observer.schedule(event_handler, path=path)
     observer.start()
