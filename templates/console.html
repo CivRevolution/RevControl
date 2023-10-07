@@ -47,6 +47,23 @@
             socket.emit('send_command', command);
             document.getElementById('command').value = '';
         }
+
+        // Logging for Socket.IO connection issues
+        socket.on('connect_error', function(error) {
+            console.error('Connection Error:', error);
+        });
+
+        socket.on('connect_timeout', function(timeout) {
+            console.error('Connection Timeout:', timeout);
+        });
+
+        socket.on('reconnect_error', function(error) {
+            console.error('Reconnection Error:', error);
+        });
+
+        socket.on('reconnect_failed', function() {
+            console.error('Reconnection Failed');
+        });
     </script>
 
     <!-- Bootstrap 5 JS (Optional) -->
