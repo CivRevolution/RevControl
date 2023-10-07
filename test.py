@@ -1,21 +1,13 @@
-from flask import Flask, render_template
-from flask_socketio import SocketIO, emit
-import threading
+import asyncio
+import websockets
 import time
 
-app = Flask(__name__)
-socketio = SocketIO(app)
-
-@app.route('/')
-def index():
-    return render_template('index.html')
-
-def send_messages():
+async def echo(websocket, path):
     while True:
-        time.sleep(5)
-        socketio.emit('message', {'data': 'Hello, Client!'})
+        await websocket.send("Hello, Client!")
+        await asyncio.sleep(5)
 
-if __name__ == '__main__':
-    thread = threading.Thread(target=send_messages)
-    thread.start()
-    socketio.run(app, host='0.0.0.0', port=5000)
+start_server = websockets.serve(echo, "0.0.0.0", 5678)
+
+asyncio.get_event_loop().run_until_complete(start_server)
+asyncio.get_event_loop().run_forever()
