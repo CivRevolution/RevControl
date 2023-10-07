@@ -17,15 +17,19 @@ app = Flask(__name__)
 socketio = SocketIO(app)
 
 def download_paper_jar():
+    print("Fetching PaperMC server download URL...")
     response = requests.get(PAPER_JAR_URL)
     data = response.json()
     download_url = data["versions"][SERVER_VERSION]
+    print(f"Downloading PaperMC server from {download_url}...")
     with requests.get(download_url, stream=True) as r:
         with open("paper.jar", "wb") as f:
             for chunk in r.iter_content(chunk_size=8192):
                 f.write(chunk)
+    print("Download completed.")
 
 def modify_server_properties():
+    print("Modifying server.properties...")
     with open("server.properties", "r") as f:
         content = f.readlines()
     with open("server.properties", "w") as f:
@@ -34,8 +38,10 @@ def modify_server_properties():
                 f.write("eula=true\n")
             else:
                 f.write(line)
+    print("server.properties modified successfully.")
 
 def run_minecraft_server():
+    print("Starting Minecraft server...")
     cmd = [JAVA_PATH, f"-Xmx{MEMORY}", f"-Xms{MEMORY}", "-jar", "paper.jar", "nogui"] + OTHER_OPTIONS
     process = subprocess.Popen(cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, bufsize=1, universal_newlines=True)
 
@@ -44,6 +50,7 @@ def run_minecraft_server():
             f.write(line)
             socketio.emit('console_output', {'data': line.strip()})
             if "Timings Reset" in line:
+                print("Minecraft server startup completed. Sending shutdown command...")
                 process.stdin.write("stop\n")
                 process.stdin.flush()
 
@@ -76,6 +83,8 @@ def handle_command(command):
     process.stdin.flush()
 
 if __name__ == '__main__':
+    print("Initializing server...")
     thread = threading.Thread(target=run_minecraft_server)
     thread.start()
+    print(f"Starting Flask app on http://0.0.0.0:5000/")
     socketio.run(app, host='0.0.0.0', port=5000)
