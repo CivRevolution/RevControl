@@ -65,7 +65,11 @@
         var consoleDiv = document.getElementById('console');
         consoleDiv.innerHTML += data.data + '<br>';
         consoleDiv.scrollTop = consoleDiv.scrollHeight;
-        callback();  // This sends the acknowledgment back to the server
+
+        // Check if callback is provided before calling it
+        if (typeof callback === "function") {
+            callback();  // This sends the acknowledgment back to the server
+        }
     });
 
     function sendCommand() {
