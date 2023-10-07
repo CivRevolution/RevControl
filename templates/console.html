@@ -74,6 +74,11 @@
     socket.on('disconnect', function(reason) {
         console.error('Disconnected:', reason);
     });
+
+    socket.on('connect', function() {
+        socket.emit('join', 'minecraft_logs');
+    });
+
 </script>
 
     <!-- Bootstrap 5 JS (Optional) -->
