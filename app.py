@@ -20,7 +20,12 @@ process = None
 
 @socketio.on('connect')
 def test_connect():
-    emit('console_output', {'data': 'Connected to the server!'})
+    emit('console_output', {'data': 'Connected to the server!'}, namespace='/')
+
+@app.route('/test_emit')
+def test_emit():
+    socketio.emit('console_output', {'data': 'Test emit from route.'}, namespace='/')
+    return "Emitted message"
 
 def download_paper_jar():
     print("Fetching PaperMC server download URL...")
@@ -85,7 +90,7 @@ def run_minecraft_server():
     # Tail the latest.log file and emit new lines to the web console
     for line in tail_log_file('./logs/latest.log'):
         print("Sending to client:", line.strip())  # Debug print
-        socketio.emit('console_output', {'data': line.strip()})
+        socketio.emit('console_output', {'data': line.strip()}, namespace='/')
 
 # Check if paper.jar exists
 if not os.path.exists("paper.jar"):
