@@ -1,21 +1,21 @@
 from flask import Flask, render_template
-from flask_socketio import SocketIO
+from flask_socketio import SocketIO, emit
 import threading
 import time
 
 app = Flask(__name__)
-socketio = SocketIO(app, cors_allowed_origins="*")
+socketio = SocketIO(app)
 
 @app.route('/')
 def index():
     return render_template('index.html')
 
-def send_message():
+def send_messages():
     while True:
         time.sleep(5)
-        socketio.emit('message', {'data': 'Hello, client!'})
+        socketio.emit('message', {'data': 'Hello, Client!'})
 
 if __name__ == '__main__':
-    thread = threading.Thread(target=send_message)
+    thread = threading.Thread(target=send_messages)
     thread.start()
     socketio.run(app, host='0.0.0.0', port=5000)
