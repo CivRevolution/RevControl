@@ -34,7 +34,12 @@
     </div>
 
     <script>
-    var socket = io.connect(location.origin);
+    var socket = io.connect(location.origin, {
+        reconnection: true,
+        reconnectionDelay: 1000,
+        reconnectionDelayMax: 5000,
+        reconnectionAttempts: Infinity
+    });
 
     socket.on('console_output', function(data) {
         console.log("Received from server:", data.data);  // Log every message received
