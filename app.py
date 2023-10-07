@@ -15,6 +15,7 @@ PAPER_JAR_URL = "https://gist.githubusercontent.com/osipxd/6119732e30059241c2192
 
 app = Flask(__name__)
 socketio = SocketIO(app)
+process = None
 
 def download_paper_jar():
     print("Fetching PaperMC server download URL...")
@@ -40,7 +41,16 @@ def modify_server_properties():
                 f.write(line)
     print("server.properties modified successfully.")
 
+def initial_server_start():
+    global process
+    print("Starting Minecraft server for the first time...")
+    cmd = [JAVA_PATH, f"-Xmx{MEMORY}", f"-Xms{MEMORY}", "-jar", "paper.jar", "nogui"] + OTHER_OPTIONS
+    process = subprocess.Popen(cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, bufsize=1, universal_newlines=True)
+    process.communicate()  # Wait for the process to complete
+    modify_server_properties()
+
 def run_minecraft_server():
+    global process
     print("Starting Minecraft server...")
     cmd = [JAVA_PATH, f"-Xmx{MEMORY}", f"-Xms{MEMORY}", "-jar", "paper.jar", "nogui"] + OTHER_OPTIONS
     process = subprocess.Popen(cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, bufsize=1, universal_newlines=True)
@@ -49,16 +59,11 @@ def run_minecraft_server():
         for line in iter(process.stdout.readline, ''):
             f.write(line)
             socketio.emit('console_output', {'data': line.strip()})
-            if "Timings Reset" in line:
-                print("Minecraft server startup completed. Sending shutdown command...")
-                process.stdin.write("stop\n")
-                process.stdin.flush()
 
 # Check if paper.jar exists
 if not os.path.exists("paper.jar"):
     download_paper_jar()
-    # Start the server for the first time
-    run_minecraft_server()
+    initial_server_start()
 
 @app.route('/api/logs', methods=['GET'])
 def get_logs():
