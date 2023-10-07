@@ -3,7 +3,7 @@ import os
 import subprocess
 import threading
 from flask import Flask, request, jsonify, render_template
-from flask_socketio import SocketIO, emit
+from flask_socketio import SocketIO, emit, join_room
 import time
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
@@ -22,6 +22,7 @@ process = None
 
 @socketio.on('connect')
 def test_connect():
+    join_room('minecraft_logs')
     emit('console_output', {'data': 'Connected to the server!'})
 
 def download_paper_jar():
@@ -82,7 +83,6 @@ class LogHandler(FileSystemEventHandler):
                     print("Detected new data:", new_data)  # Debug print
                     self.callback(new_data)
 
-
 def run_minecraft_server():
     global process
     print("Starting Minecraft server...")
@@ -94,7 +94,7 @@ def run_minecraft_server():
 
     # Set up watchdog to monitor the latest.log file
     path = os.path.dirname(os.path.abspath('./logs/latest.log'))
-    event_handler = LogHandler('latest.log', lambda data: socketio.emit('console_output', {'data': data.strip()}))
+    event_handler = LogHandler('latest.log', lambda data: socketio.emit('console_output', {'data': data.strip()}, room='minecraft_logs'))
     observer = Observer()
     observer.schedule(event_handler, path=path)
     observer.start()
