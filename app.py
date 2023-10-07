@@ -5,6 +5,8 @@ import threading
 from flask import Flask, request, jsonify, render_template
 from flask_socketio import SocketIO, emit
 import time
+from watchdog.observers import Observer
+from watchdog.events import FileSystemEventHandler
 
 # Settings
 JAVA_PATH = "java"
@@ -20,12 +22,7 @@ process = None
 
 @socketio.on('connect')
 def test_connect():
-    emit('console_output', {'data': 'Connected to the server!'}, namespace='/')
-
-@app.route('/test_emit')
-def test_emit():
-    socketio.emit('console_output', {'data': 'Test emit from route.'}, namespace='/')
-    return "Emitted message"
+    emit('console_output', {'data': 'Connected to the server!'})
 
 def download_paper_jar():
     print("Fetching PaperMC server download URL...")
@@ -65,18 +62,20 @@ def initial_server_start():
     process.terminate()
     process.wait()
 
-def tail_log_file(filename):
-    """
-    Generator function that yields new lines from a file continuously.
-    """
-    with open(filename, 'r') as f:
-        f.seek(0, 2)  # Go to the end of the file
-        while True:
-            line = f.readline()
-            if not line:
-                time.sleep(0.1)  # Sleep briefly before trying again
-                continue
-            yield line
+class LogHandler(FileSystemEventHandler):
+    def __init__(self, filename, callback):
+        self.filename = filename
+        self.callback = callback
+        self.last_position = 0
+
+    def on_modified(self, event):
+        if not event.is_directory and event.src_path.endswith(self.filename):
+            with open(self.filename, 'r') as f:
+                f.seek(self.last_position)
+                new_data = f.read()
+                self.last_position = f.tell()
+                if new_data:
+                    self.callback(new_data)
 
 def run_minecraft_server():
     global process
@@ -87,10 +86,12 @@ def run_minecraft_server():
     # Wait a bit to ensure the server has started and is writing to the log file
     time.sleep(5)
 
-    # Tail the latest.log file and emit new lines to the web console
-    for line in tail_log_file('./logs/latest.log'):
-        print("Sending to client:", line.strip())  # Debug print
-        socketio.emit('console_output', {'data': line.strip()}, namespace='/')
+    # Set up watchdog to monitor the latest.log file
+    path = os.path.dirname(os.path.abspath('./logs/latest.log'))
+    event_handler = LogHandler('latest.log', lambda data: socketio.emit('console_output', {'data': data.strip()}))
+    observer = Observer()
+    observer.schedule(event_handler, path=path)
+    observer.start()
 
 # Check if paper.jar exists
 if not os.path.exists("paper.jar"):

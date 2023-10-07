@@ -2,3 +2,4 @@ flask>=2.0.1
 flask_socketio>=5.1.1
 requests>=2.26.0
 eventlet>=0.31.1
+watchdog
