@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Minecraft Console</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+</head>
+<body>
+    <div id="console" style="height:400px; overflow:auto; border:1px solid black;"></div>
+    <input type="text" id="command" placeholder="Enter command">
+    <button onclick="sendCommand()">Send</button>
+
+    <script>
+        var socket = io.connect('http://localhost:5000');
+
+        socket.on('console_output', function(data) {
+            var consoleDiv = document.getElementById('console');
+            consoleDiv.innerHTML += data.data + '<br>';
+            consoleDiv.scrollTop = consoleDiv.scrollHeight;
+        });
+
+        function sendCommand() {
+            var command = document.getElementById('command').value;
+            socket.emit('send_command', command);
+            document.getElementById('command').value = '';
+        }
+    </script>
+</body>
+</html>
