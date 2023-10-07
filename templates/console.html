@@ -41,6 +41,25 @@
         reconnectionAttempts: Infinity
     });
 
+    // Capture all incoming messages
+    socket.on('message', function(data) {
+        console.log("Generic Message Received:", data);
+    });
+
+    // Capture all events
+    socket.onevent = function (packet) {
+        var args = packet.data || [];
+        console.log("Event:", packet.type, "Data:", ...args);
+        this.__proto__.onevent.call(this, packet);    // original call
+    };
+
+    // Capture all emitted events
+    var originalEmit = socket.emit;
+    socket.emit = function() {
+        console.log("Emitting Event:", arguments[0], "Data:", Array.prototype.slice.call(arguments, 1));
+        originalEmit.apply(this, arguments);
+    };
+
     socket.on('console_output', function(data) {
         console.log("Received from server:", data.data);  // Log every message received
         var consoleDiv = document.getElementById('console');
