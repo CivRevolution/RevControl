@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebSocket Test</title>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            var socket = new WebSocket("ws://YOUR_SERVER_IP:5678/");
+            socket.onmessage = function(event) {
+                document.getElementById('messages').innerHTML += '<p>' + event.data + '</p>';
+            };
+        });
+    </script>
+</head>
+<body>
+    <div id="messages"></div>
+</body>
+</html>
