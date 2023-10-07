@@ -23,7 +23,7 @@ process = None
 @socketio.on('connect')
 def test_connect():
     join_room('minecraft_logs')
-    emit('console_output', {'data': 'Connected to the server!'})
+    socketio.emit('console_output', {'data': 'Connected to the server!'})
 
 def download_paper_jar():
     print("Fetching PaperMC server download URL...")
@@ -94,7 +94,7 @@ def run_minecraft_server():
 
     # Set up watchdog to monitor the latest.log file
     path = os.path.dirname(os.path.abspath('./logs/latest.log'))
-    event_handler = LogHandler('latest.log', lambda data: socketio.emit('console_output', {'data': data.strip()}))
+    event_handler = LogHandler('latest.log', lambda data: socketio.emit('console_output', {'data': data.strip()}, room='minecraft_logs'))
     observer = Observer()
     observer.schedule(event_handler, path=path)
     observer.start()
