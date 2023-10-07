@@ -17,7 +17,7 @@ SERVER_VERSION = "1.20.1"
 PAPER_JAR_URL = "https://gist.githubusercontent.com/osipxd/6119732e30059241c2192c4a8d2218d9/raw/8999ab98f5779901780c3ef7a3f8b7b86a7e4281/paper-versions.json"
 
 app = Flask(__name__)
-socketio = SocketIO(app, logger=True, engineio_logger=True)
+socketio = SocketIO(app, logger=True, engineio_logger=True, message_queue='redis://')
 process = None
 
 @socketio.on('connect')
