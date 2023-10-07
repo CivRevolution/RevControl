@@ -62,6 +62,10 @@ def initial_server_start():
     process.terminate()
     process.wait()
 
+def emit_log_data(data):
+    print("Emitting data:", data)  # Debug print
+    socketio.emit('console_output', {'data': data})
+
 class LogHandler(FileSystemEventHandler):
     def __init__(self, filename, callback):
         self.filename = filename
@@ -75,6 +79,7 @@ class LogHandler(FileSystemEventHandler):
                 new_data = f.read()
                 self.last_position = f.tell()
                 if new_data:
+                    print("Detected new data:", new_data)  # Debug print
                     self.callback(new_data)
 
 
