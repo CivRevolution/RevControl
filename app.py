@@ -49,6 +49,9 @@ def modify_eula_file():
                 f.write(line)
     print("eula.txt modified successfully.")
 
+def ack():
+    print("Message was received by the client!")
+
 def initial_server_start():
     global process
     print("Starting Minecraft server for the first time...")

@@ -60,11 +60,12 @@
         originalEmit.apply(this, arguments);
     };
 
-    socket.on('console_output', function(data) {
-        console.log("Received from server:", data.data);  // Log every message received
+    socket.on('console_output', function(data, callback) {
+        console.log("Received from server:", data.data);
         var consoleDiv = document.getElementById('console');
         consoleDiv.innerHTML += data.data + '<br>';
         consoleDiv.scrollTop = consoleDiv.scrollHeight;
+        callback();  // Acknowledge receipt of the message
     });
 
     function sendCommand() {
