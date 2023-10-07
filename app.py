@@ -17,6 +17,10 @@ app = Flask(__name__)
 socketio = SocketIO(app)
 process = None
 
+@socketio.on('connect')
+def test_connect():
+    emit('console_output', {'data': 'Connected to the server!'})
+
 def download_paper_jar():
     print("Fetching PaperMC server download URL...")
     response = requests.get(PAPER_JAR_URL)
@@ -64,6 +68,7 @@ def run_minecraft_server():
     with open(LOG_FILE, 'a') as f:
         for line in iter(process.stdout.readline, ''):
             f.write(line)
+            print("Sending to client:", line.strip())  # Debug print
             socketio.emit('console_output', {'data': line.strip()})
 
 # Check if paper.jar exists

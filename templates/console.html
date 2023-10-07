@@ -64,6 +64,23 @@
         socket.on('reconnect_failed', function() {
             console.error('Reconnection Failed');
         });
+
+        // Additional logging for Socket.IO events
+        socket.on('connect', function() {
+            console.log('Connected to the server!');
+        });
+
+        socket.on('disconnect', function(reason) {
+            console.log('Disconnected from the server. Reason:', reason);
+        });
+
+        socket.on('reconnecting', function(attemptNumber) {
+            console.log('Attempting to reconnect. Attempt number:', attemptNumber);
+        });
+
+        socket.on('reconnect', function(attemptNumber) {
+            console.log('Successfully reconnected. Attempt number:', attemptNumber);
+        });
     </script>
 
     <!-- Bootstrap 5 JS (Optional) -->
